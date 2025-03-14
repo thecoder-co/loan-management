@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -19,7 +20,7 @@ return new class extends Migration
         $table->decimal('loan_amount', 10, 2);
         $table->decimal('interest_rate', 5, 2);
         $table->integer('repayment_plan');
-        $table->date('start_date');
+        $table->date('start_date')->default(DB::raw('CURRENT_TIMESTAMP'))->change();
         $table->date('end_date');
         $table->decimal('total_amount_due', 10, 2);
         $table->decimal('monthly_installment', 10, 2);

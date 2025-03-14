@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class Authenticate extends Middleware
 {
@@ -16,4 +18,12 @@ class Authenticate extends Middleware
     {
         return null;
     }
+    // public function handle($request, \Closure $next, ...$guards): JsonResponse
+    // {
+    //     if ($this->authenticate($request, $guards) === null) {
+    //         return response()->json(['error' => 'Unauthorized'], 401);
+    //     }
+
+    //     return $next($request);
+    // }
 }

@@ -20,18 +20,22 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 // JWT-Protected Routes
 Route::middleware('auth:api')->group(function () {
-    Route::get('profile', [CustomerController::class, 'profile']);
-    // Balance & transactions
-    Route::post('balance/add', [CustomerController::class, 'addBalance']);
-    Route::get('transactions', [CustomerController::class, 'transactions']);
-    Route::post('pay-service', [CustomerController::class, 'payService']);
-
+    // Balance & transaction
+    Route::controller(CustomerController::class)->group(function () {
+        Route::get('profile', 'profile');
+        Route::post('balance/add', 'addBalance');
+        Route::get('admin/customers/getAllCustomers', 'getAllCustomers');
+        Route::get('transactions', 'transactions');
+        Route::post('pay-service', 'payService');
+    });
 
     // Loan operations
     Route::controller(LoanController::class)->group(function () {
+        Route::get('/loans/customer/{customer_id}', 'getLoansByCustomerId');
         Route::post('loans', 'takeLoan');
         Route::get('loans', 'index');
         Route::get('loans/{loan}', 'show');
+        Route::get('admin/loans/getAllLoans', 'getAllLoans');
         Route::post('loans/{loan}/repay', 'repay');
     });
 });
@@ -39,6 +43,8 @@ Route::middleware('auth:api')->group(function () {
 Route::controller(CustomerController::class)->group(function(){
     Route::post('register', 'register');
     Route::post('login', 'login');
+    Route::post('admin/register', 'registerAdmin');
+    Route::post('admin/login', 'loginAdmin');
 });
 
 // Route::get('test-token', function (Request $request) {

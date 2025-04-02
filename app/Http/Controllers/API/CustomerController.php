@@ -48,6 +48,39 @@ class CustomerController extends BaseController
     ], 201);
 }
     /**
+     * Register api
+     *
+     * @return \Illuminate\Http\Response
+     */
+   public function registerAdmin(Request $request): JsonResponse
+{
+    $validator = Validator::make($request->all(), [
+        'name' => 'required',
+        'email' => 'required|email|unique:customers',
+        'password' => 'required|min:6',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 422);
+    }
+
+    $customer = Customer::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'role' => 'admin',
+        'password' => bcrypt($request->password),
+    ]);
+
+    // Generate a JWT Token (correct method)
+    $token = JWTAuth::fromUser($customer);
+
+    return response()->json([
+        'message' => 'User registered successfully.',
+        'token' => $token,
+        'user' => $customer,
+    ], 201);
+}
+    /**
      * Login api
      *
      * @return \Illuminate\Http\Response
@@ -61,6 +94,32 @@ class CustomerController extends BaseController
         return response()->json(['error' => 'Unauthorized'], 401);
     }
 
+
+
+    return response()->json([
+        'message' => 'Login successful.',
+        'token' => $token,
+        'user' => auth()->user()
+    ]);
+}
+
+/**
+     * Login api
+     *
+     * @return \Illuminate\Http\Response
+     */
+   public function loginAdmin(Request $request): JsonResponse
+{
+    $credentials = $request->only('email', 'password');
+
+    if (!$token = JWTAuth::attempt($credentials)) {
+
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    if(auth()->user()->role !== 'admin'){
+        return response()->json(['error' => 'Unauthorized'], 401);
+
+    }
     return response()->json([
         'message' => 'Login successful.',
         'token' => $token,
@@ -111,6 +170,21 @@ public function transactions(): JsonResponse
 
     return response()->json([
         'transactions' => $transactions
+    ]);
+}
+
+public function getAllCustomers(): JsonResponse
+{
+
+    $customer = JWTAuth::user();
+
+    if($customer->role !== 'admin'){
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    $customers = Customer::all();
+
+    return response()->json([
+        'customers' => $customers
     ]);
 }
 

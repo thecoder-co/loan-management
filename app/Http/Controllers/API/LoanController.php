@@ -10,6 +10,44 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class LoanController extends Controller
 {
+
+    public function getAllLoans()
+{
+
+    $customer = JWTAuth::user();
+    if($customer->role !== 'admin'){
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    $loans = Loan::with('customer')->get();
+
+    return response()->json([
+        'loans' => $loans
+    ]);
+}
+
+public function getLoansByCustomerId($customer_id)
+{
+    $customer = JWTAuth::user();
+
+    // Ensure that the logged-in user is either an admin or the customer requesting their loans
+    if ($customer->role !== 'admin' && $customer->id != $customer_id) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    // Fetch loans belonging to the specific customer
+    $loans = Loan::with('customer')->where('customer_id', $customer_id)->get();
+
+    // Check if the customer has any loans
+    // if ($loans->isEmpty()) {
+    //     return response()->json(['message' => 'No loans found for this customer'], 404);
+    // }
+
+    return response()->json([
+        'customer_id' => $customer_id,
+        'loans' => $loans
+    ]);
+}
+
     // Take loan
     public function takeLoan(Request $request)
 {

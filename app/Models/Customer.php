@@ -8,7 +8,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Customer extends Authenticatable implements JWTSubject
 {
-    protected $fillable = ['name', 'email', 'password', 'balance'];
+    protected $fillable = ['name', 'email', 'password', 'balance', 'role'];
 
     protected $hidden = ['password', 'remember_token'];
 
